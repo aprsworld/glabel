@@ -55,8 +55,15 @@ if ( isset($_REQUEST['partNumber']) && '' != trim($_REQUEST['partNumber']) ) {
 			if ( false == $part ) {
 				$errors[]=sprintf("Part number %s not found.",$pNumbers[$i]);
 			} else {
-				
-				printLargeLabel($part[0],$part[1],$copies);
+				$printers = get_printers();
+				//print_r($printers);
+				if ( $printers[$printer][2] == "small" ) {
+					printLabel($part[0],$part[1],$copies);
+					//echo "small";
+				} else {
+					printLargeLabel($part[0],$part[1],$copies);
+					//echo "large";
+				}
 				$table =$table."<tr><td>". $part[0]."</td><td>: ".$part[1].".</td></tr>";
 				sleep(1);
 //				$cmd = sprintf("/usr/local/bin/printRemoveable %s",$part[0]);
@@ -92,16 +99,14 @@ function printLabel($p0,$p1,$numToPrint){
 			"P".($numToPrint*$nCopies)."\n";
 
 
-	if ( !$debug &&false){
-		$sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-		$checkSocket = socket_connect($sock,$printers[$printer][0], $printers[$printer][1]);
-	//	$checkSocket = socket_connect($sock,"192.168.10.130", 9100);
-		$len = strlen($outToPrinter);
-		socket_send($sock, $outToPrinter, $len, MSG_EOF);
-		socket_close($sock);
-	} else {
-		echo $outToPrinter;
-	}
+
+	$sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+	$checkSocket = socket_connect($sock,$printers[$printer][0], $printers[$printer][1]);
+//	$checkSocket = socket_connect($sock,"192.168.10.130", 9100);
+	$len = strlen($outToPrinter);
+	socket_send($sock, $outToPrinter, $len, MSG_EOF);
+	socket_close($sock);
+	
 }
 
 function printLargeLabel($p0,$p1,$numToPrint){
@@ -120,26 +125,29 @@ function printLargeLabel($p0,$p1,$numToPrint){
 			"Q1200,24\n". 
 			"\n".
 			"N\n". 
-			"\n".
-			sprintf("A695,0,1,5,3,4,N,\"%s\"\n",$p0). 
-			sprintf("A467,60,1,5,1,1,N,\"%s\"\n",substr($p1,0,28)). 
+			"\n";
+
+	if ( strlen($p0) > 8 ) {
+		$outToPrinter.= sprintf("A795,20,1,5,4,2,N,\"%s\"\n",$p0);
+	} else {
+		$outToPrinter.= sprintf("A795,20,1,5,4,4,N,\"%s\"\n",$p0);
+	}
+
+	$outToPrinter.= sprintf("A467,60,1,5,1,1,N,\"%s\"\n",substr($p1,0,28)). 
 			sprintf("A371,60,1,5,1,1,N,\"%s\"\n",substr($p1,28,28)).
 			//"B90,5,0,3,2,4,65,N,\APRS9111\"\n".
-			sprintf("B275,40,1,3,2,4,130,N,\"%s\"\n",$p0).
+			sprintf("B275,40,1,3,2,8,130,N,\"%s\"\n",$p0).
 			"P".($numToPrint*$nCopies)."\n";
 
 	
-	if ( !$debug && false || true ){
-		$sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-		$checkSocket = socket_connect($sock,$printers[$printer][0], $printers[$printer][1]);
-	//	$checkSocket = socket_connect($sock,"192.168.10.130", 9100);
-		$len = strlen($outToPrinter);
-		socket_send($sock, $outToPrinter, $len, MSG_EOF);
-		socket_close($sock);
-	} else {
-		echo $outToPrinter;
-		echo "<h1>This shouldn't work</h1>";
-	}
+	
+	$sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+	$checkSocket = socket_connect($sock,$printers[$printer][0], $printers[$printer][1]);
+//	$checkSocket = socket_connect($sock,"192.168.10.130", 9100);
+	$len = strlen($outToPrinter);
+	socket_send($sock, $outToPrinter, $len, MSG_EOF);
+	socket_close($sock);
+	
 }
 
 
