@@ -166,7 +166,7 @@ if ( $labelSize==1 ) {
 			$StartX-=$addSpace+30;
 		}
 		$outToPrinter= $outToPrinter . "\nP".$numCopies."\n";
-	//	echo $outToPrinter;
+		echo $outToPrinter;
 //		echo "Printing Large Label";
 	} else {
 		$outToPrinter=  "not enough room on the label or label is empty";

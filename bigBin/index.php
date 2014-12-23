@@ -1,4 +1,9 @@
 <?
+/*
+ini_set('display_errors',1);
+ini_set('display_startup_errors',1);
+error_reporting(-1);
+//*/
 session_start();
 if(isset($_REQUEST['printer'])){
 	
@@ -6,7 +11,7 @@ if(isset($_REQUEST['printer'])){
 	
 	
 }
-
+$debug= true;
 $title="Bin Label Printer";
 require '../glabel_config.php';
 require $_SERVER['DOCUMENT_ROOT'] . '/world_head.php';
@@ -51,7 +56,7 @@ if ( isset($_REQUEST['partNumber']) && '' != trim($_REQUEST['partNumber']) ) {
 				$errors[]=sprintf("Part number %s not found.",$pNumbers[$i]);
 			} else {
 				
-				printLabel($part[0],$part[1],$copies);
+				printLargeLabel($part[0],$part[1],$copies);
 				$table =$table."<tr><td>". $part[0]."</td><td>: ".$part[1].".</td></tr>";
 				sleep(1);
 //				$cmd = sprintf("/usr/local/bin/printRemoveable %s",$part[0]);
@@ -63,18 +68,82 @@ if ( isset($_REQUEST['partNumber']) && '' != trim($_REQUEST['partNumber']) ) {
 }
 
 $printers = get_printers();//gets a 2 dimensional array containing a list of label printers on the server
+/* $p0 is the serial number, $p1 is the text description, $numToPrint is the number of labels to print */
 function printLabel($p0,$p1,$numToPrint){
 	$nCopies = $_REQUEST['nCopies'];
 	$printer = $_REQUEST['printer'];
 	$printers = get_printers();
-	$outToPrinter="OD\nJF\nS2\nD10\nq830\nQ150,24\n\nN\n\nA15,5,0,4,1,1,N,\"". substr($p0,0,4)."\"\nA14,35,0,4,1,1,N,\"" . substr($p0,4). "\"\nB90,5,0,3,2,4,65,N,\"". $p0."\"\nA15,75,0,4,1,1,N,\"". str_replace('"','\"',substr($p1,0,24))."\"\nA15,100,0,4,1,1,N,\"". str_replace('"','\"',substr($p1,24,24))."\"\nP".($numToPrint*$nCopies)."\n";
-	$sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-	$checkSocket = socket_connect($sock,$printers[$printer][0], $printers[$printer][1]);
-//	$checkSocket = socket_connect($sock,"192.168.10.130", 9100);
-	$len = strlen($outToPrinter);
-	socket_send($sock, $outToPrinter, $len, MSG_EOF);
-	socket_close($sock);
+
+
+	$outToPrinter=	"OD\n".
+			"JF\n".
+			"S2\n".
+			"D10\n".
+			"q830\n".
+			"Q150,24\n".
+			"\n".
+			"N\n".
+			"\n".
+			"A15,5,0,4,1,1,N,\"".substr($p0,0,4)."\"\n". //APRS
+			"A14,35,0,4,1,1,N,\"" . substr($p0,4)."\"\n". //serialNumber without prefix
+			"B90,5,0,3,2,4,65,N,\"". $p0."\"\n". //barcode
+			"A15,75,0,4,1,1,N,\"". str_replace('"','\"',substr($p1,0,24))."\"\n". // first 24 chars of description
+			"A15,100,0,4,1,1,N,\"".str_replace('"','\"',substr($p1,24,24))."\"\n".// The rest of the description that will fit
+			"P".($numToPrint*$nCopies)."\n";
+
+
+	if ( !$debug &&false){
+		$sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+		$checkSocket = socket_connect($sock,$printers[$printer][0], $printers[$printer][1]);
+	//	$checkSocket = socket_connect($sock,"192.168.10.130", 9100);
+		$len = strlen($outToPrinter);
+		socket_send($sock, $outToPrinter, $len, MSG_EOF);
+		socket_close($sock);
+	} else {
+		echo $outToPrinter;
+	}
 }
+
+function printLargeLabel($p0,$p1,$numToPrint){
+	$nCopies = $_REQUEST['nCopies'];
+	$printer = $_REQUEST['printer'];
+	$printers = get_printers();
+	
+	$p0 = strtoupper($p0);
+	$p1 = strtoupper($p1);
+	
+	$outToPrinter=	"OD\n". 
+			"JF\n". 
+			"S2\n". 
+			"D10\n". 
+			"q830\n". 
+			"Q1200,24\n". 
+			"\n".
+			"N\n". 
+			"\n".
+			sprintf("A695,0,1,5,3,4,N,\"%s\"\n",$p0). 
+			sprintf("A467,60,1,5,1,1,N,\"%s\"\n",substr($p1,0,28)). 
+			sprintf("A371,60,1,5,1,1,N,\"%s\"\n",substr($p1,28,28)).
+			//"B90,5,0,3,2,4,65,N,\APRS9111\"\n".
+			sprintf("B275,40,1,3,2,4,130,N,\"%s\"\n",$p0).
+			"P".($numToPrint*$nCopies)."\n";
+
+	
+	if ( !$debug && false || true ){
+		$sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+		$checkSocket = socket_connect($sock,$printers[$printer][0], $printers[$printer][1]);
+	//	$checkSocket = socket_connect($sock,"192.168.10.130", 9100);
+		$len = strlen($outToPrinter);
+		socket_send($sock, $outToPrinter, $len, MSG_EOF);
+		socket_close($sock);
+	} else {
+		echo $outToPrinter;
+		echo "<h1>This shouldn't work</h1>";
+	}
+}
+
+
+
 
 if ( count($errors) ) {
 	printf("<h2>Error(s) Encountered</h2>");
@@ -91,7 +160,7 @@ if ( count($errors) ) {
 <td>
 <h1>Bin Labels</h1>
 To choose another kind of label to print out, please use the link at the bottom of the page to go back. Using the back button on the browser may print out extra labels.<br /><br />
-<form method="get" action="/glabel/bin/">
+<form method="get" action="/glabel/bigBin/">
 <textarea name="partNumber" rows="20">
 </textarea>
 <br />
