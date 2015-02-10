@@ -285,12 +285,69 @@ if ( $print ) {
 			var choice = x.options[x.selectedIndex].value;
 			if ( choice==1 ) {
 				previewSmallLabel();
-				document.getElementById("printerS").selectedIndex = "0";
+			//	document.getElementById("printerS").selectedIndex = "<? printf($_COOKIE["print"]); ?>";
 			}
 			if ( choice==2 ) {
 				previewLargeLabel();
-				document.getElementById("printerS").selectedIndex = "2";
+			//	document.getElementById("printerS").selectedIndex = "2";
 			}	
+		}
+		<?  
+
+		//make this generated from the info in config
+		$printers = get_printers();
+		for ( $i = 0 ; $i < count($printers) ; $i++ ) {
+			if ('small' == $printers[$i][2]) {
+				$smallIndices.=",".$i;
+			} else {
+				$largeIndices.=",".$i;
+			}
+		}
+
+		$smallIndices=substr($smallIndices,1);
+		$largeIndices=substr($largeIndices,1);
+
+		?>
+
+		var smallIndices = [<? printf($smallIndices); ?>];
+		var largeIndices = [<? printf($largeIndices); ?>];
+
+		function printerSize(changeLabel){
+			
+			var labelSelect = document.getElementById("selector");
+			var labelType = (labelSelect.options[labelSelect.selectedIndex].value);
+			console.log(labelType);
+
+			var printerSelect = document.getElementById("printerS");
+			var printerType = (printerSelect.options[printerSelect.selectedIndex].value);
+			console.log(printerType);
+			console.log(parseFloat(printerType));
+			if ( 1 == labelType ) { //small label 
+				if ( -1 != smallIndices.indexOf(parseFloat(printerType)) ) {
+					console.log("match");
+				} else {
+					console.log("no match");
+					if ( changeLabel ) {
+						document.getElementById("selector").selectedIndex = 1;
+					} else {
+						document.getElementById("printerS").selectedIndex = smallIndices[0];
+					}
+				}
+			} else  { //large label
+				if ( -1 != largeIndices.indexOf(parseFloat(printerType)) ) {
+					console.log("match");
+				} else {
+					console.log("no match");
+					if ( changeLabel ) {
+						document.getElementById("selector").selectedIndex = 0;
+					} else {
+						document.getElementById("printerS").selectedIndex = largeIndices[0];
+					}
+				}
+				
+			} 
+
+			
 		}
 
 		function clearTextArea(){
@@ -298,6 +355,17 @@ if ( $print ) {
 			$("#preview").html("");
 			makeprev();
 		}
+
+		$( document ).ready(function(){
+
+			$("#selector").on('change', function(){
+				printerSize(false);
+			});
+			$("#printerS").on('change', function(){
+				printerSize(true);
+			});
+
+		});
 	</script>
 </head>
 <body onload="makeprev()">
