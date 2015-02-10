@@ -1,7 +1,7 @@
 <?
 
 session_start();
-if(isset($_REQUEST['printer'])){
+if ( isset($_REQUEST['printer'])) {
 	
 		setcookie('print',$_REQUEST['printer'],time()+360000);
 	
@@ -22,33 +22,33 @@ if ( isset($_REQUEST['mac']) && '' != trim($_REQUEST['mac']) ) {
 	$m=strtoupper(trim($_REQUEST['mac']));
 
 	$macAddresses = explode("\n",$m);
-//	$printers=get_printers();
-//	$printer = "| /bin/nc -w 2 ".$printers[$_REQUEST['printer']][0]." ".$printers[$_REQUEST['printer']][1]; 
-//	printf($printer);
+	//	$printers=get_printers();
+	//	$printer = "| /bin/nc -w 2 ".$printers[$_REQUEST['printer']][0]." ".$printers[$_REQUEST['printer']][1]; 
+	//	printf($printer);
 	for ( $i=0 ; $i<count($macAddresses) ; $i++ ) {
 		$macAddresses[$i]=strtoupper(trim($macAddresses[$i]));
 
 		/* should strip any non-hexadecimal characters */
 
 		/* check if valid - length, etc */
-		if($_REQUEST['SorM']==1){
+		if ( $_REQUEST['SorM'] == 1) {
 			if ( 12 != strlen($macAddresses[$i]) ) {
 				$errors[]=sprintf("Invalid MAC address %s.",$macAddresses[$i]);
 				printSerialLabel($macAddresses[$i]);
 
 			} else {
-					
-					printMacLabel($macAddresses[$i]);
-					
-					//	printMacLabel($macAddresses[$i]);
-			//$cmd = sprintf("/var/www/html/maclabels/printMAC %s %d",$macAddresses[$i],$nCopies);
-			//exec($cmd);
-			}
-		}else if($_REQUEST['SorM']==2){
-					printf("madeit");
-					printSerialLabel($macAddresses[$i]);
 
-				}
+				printMacLabel($macAddresses[$i]);
+
+				//	printMacLabel($macAddresses[$i]);
+				//$cmd = sprintf("/var/www/html/maclabels/printMAC %s %d",$macAddresses[$i],$nCopies);
+				//exec($cmd);
+			}
+		}else if ( $_REQUEST['SorM'] == 2) {
+			printf("madeit");
+			printSerialLabel($macAddresses[$i]);
+
+		}
 
 	}
 }
@@ -62,7 +62,7 @@ if ( count($errors) ) {
 	}
 	printf("</ol>\n");
 }
-function printSerialLabel($serial){
+function printSerialLabel($serial) {
 	$nCopies = $_REQUEST['nCopies'];
 	$printer = $_REQUEST['printer'];
 	$printers = get_printers();
@@ -77,7 +77,7 @@ function printSerialLabel($serial){
 	socket_send($sock, $outToPrinter, $len, MSG_EOF);
 	socket_close($sock);
 }
-function printMacLabel($macOnly){
+function printMacLabel($macOnly) {
 /*
 OD
 JF
@@ -125,7 +125,7 @@ P<? echo $nLabels; ?>
 function enterlisten(evt) {
 		//checked everytime a key is pressed in the text area
         var charCode = (evt.which) ? evt.which : event.keyCode
-		 if (charCode == 13){//if enter is pressed then print
+		 if (charCode  ==  13) {//if enter is pressed then print
 			printlabel();
 		 }	
 }
@@ -133,46 +133,46 @@ function enterlisten(evt) {
 
 function printlabel() {	
 	
-		var x=document.getElementById("IDMac"); //grabs the inputted mac address
+		var x = document.getElementById("IDMac"); //grabs the inputted mac address
 		
 		var mac = x.value.toUpperCase()
 		var copies = document.getElementById("numcopies").value; //grabs the selected number of copies to print
 		var printer = document.getElementById("printerNumber").value;
-		var SorM = document.getElementById("SM").value;
+//		var SorM = document.getElementById("SM").value;
 		x.value = "";
-		if(SorM==1){
-			if(validMacAddress(mac.trim())){//checks if valid
+		if ( validMacAddress(mac.trim()) ) {
+			if ( validMacAddress(mac.trim())) {//checks if valid
 				mac=removecolons(mac);//removes colons or any other kinds of separators
 				
 				
 				$('#invalid').hide(); //if invaild is showing on the screen it will hide that
 				$('#valid').show();//shows valid on the screen
-				setTimeout(function(){$('#valid').hide()},1000);//after a second valid is hidden
+				setTimeout(function() {$('#valid').hide()},1000);//after a second valid is hidden
 				
-				var address =  "http://192.168.10.130/glabel/copies/?mac="+mac+"&nCopies="+copies+"&printer="+printer+"&SorM="+SorM
+				var address =  "http://192.168.10.130/glabel/copies/?mac="+mac+"&nCopies="+copies+"&printer="+printer+"&SorM=1"
 				//$('#taoutput').html(address);
-				if(true){
+				if ( true) {
 					var xmlhttp = new XMLHttpRequest();
 					xmlhttp.open("GET", address, true);
 					xmlhttp.send();
 				}
 		
-			}else{
+			} else {
 				$('#valid').hide(); //hides valid if it is currently on the screen
 				$('#invalid').show();//shows invalid
-				setTimeout(function(){$('#invalid').hide()},1000);//hides invalid after a second has passed
+				setTimeout(function() {$('#invalid').hide()},1000);//hides invalid after a second has passed
 				var address =  "http://192.168.10.130/glabel/copies/?mac="+mac+"&nCopies="+copies+"&printer="+printer+"&SorM=2"
 				//$('#taoutput').html(address);
-				if(true){
+				if ( true) {
 					var xmlhttp = new XMLHttpRequest();
 					xmlhttp.open("GET", address, true);
 					xmlhttp.send();
 				}
 			}
-		}else if(SorM==2){
-				var address =  "http://192.168.10.130/glabel/copies/?mac="+mac+"&nCopies="+copies+"&printer="+printer+"&SorM="+SorM
+		} else {
+				var address =  "http://192.168.10.130/glabel/copies/?mac="+mac+"&nCopies="+copies+"&printer="+printer+"&SorM=2"
 				//$('#taoutput').html(address);
-				if(true){
+				if ( true) {
 					var xmlhttp = new XMLHttpRequest();
 					xmlhttp.open("GET", address, true);
 					xmlhttp.send();
@@ -185,47 +185,47 @@ function printlabel() {
 }
 
 
-function validMacAddress(mac){//checks if the give mac address could be a valid one
+function validMacAddress(mac) {//checks if the give mac address could be a valid one
 		var count = 0;
 		
-		for(var i = 0;i<mac.length;i++){
-			if(mac.charAt(i)=="A") {
+		for ( var i = 0;i<mac.length;i++ ) {
+			if ( mac.charAt(i) == "A" ) {
 				count++;
 			}
-			else if(mac.charAt(i)=="B"){
+			else if ( mac.charAt(i) == "B" ) {
 				count++;
 			}
-			else if(mac.charAt(i)=="C"){
+			else if ( mac.charAt(i) == "C" ) {
 				count++;
 			}
-			else if(mac.charAt(i)=="D"){
+			else if ( mac.charAt(i) == "D" ) {
 				count++;
 			}
-			else if(mac.charAt(i)=="E"){
+			else if ( mac.charAt(i) == "E" ) {
 				count++;
 			}
-			else if(mac.charAt(i)=="F"){
+			else if ( mac.charAt(i) == "F" ) {
 				count++;
 			}
-			else if(mac.charAt(i)==":"){
+			else if ( mac.charAt(i) == ":") {
 				//these are left blank because we want to ignore them as they do not effect the validity of the mac address
 			}
-			else if(mac.charAt(i)==" "){
+			else if ( mac.charAt(i) == " ") {
 				
 			}
-			else if(mac.charAt(i)=="-"){
+			else if ( mac.charAt(i) == "-") {
 				
 			}
-			else if(mac.charAt(i)==";"){
+			else if ( mac.charAt(i) == ";") {
 				
 			}
-			else if(!isNaN(mac.charAt(i))){//checks if the current character is a number
+			else if ( !isNaN(mac.charAt(i))) {//checks if the current character is a number
 				count++;
 			}else{
 				return false;//if the current character is not 0-9 or A-F or one of the specified separators, then the mac address is invalid
 			}		
 		}
-		if(count==12) {//mac address have twelve numbers/letters
+		if ( count == 12) {//mac address have twelve numbers/letters
 		
 			return true;
 			
@@ -237,41 +237,41 @@ function validMacAddress(mac){//checks if the give mac address could be a valid 
 }
 
 
-function removecolons(mac){//this just iterates through the string and adds each character that isnt a separator to a new string
+function removecolons(mac) {//this just iterates through the string and adds each character that isnt a separator to a new string
 		var cleanedMac="";
 		
-		for(var i = 0;i<mac.length;i++){
-			if(mac.charAt(i)=="A") {
+		for(var i = 0;i<mac.length;i++) {
+			if ( mac.charAt(i) == "A") {
 				cleanedMac+=mac.charAt(i);
 			}
-			else if(mac.charAt(i)=="B"){
+			else if ( mac.charAt(i) == "B") {
 				cleanedMac+=mac.charAt(i);
 			}
-			else if(mac.charAt(i)=="C"){
+			else if ( mac.charAt(i) == "C") {
 				cleanedMac+=mac.charAt(i);
 			}
-			else if(mac.charAt(i)=="D"){
+			else if ( mac.charAt(i) == "D") {
 				cleanedMac+=mac.charAt(i);
 			}
-			else if(mac.charAt(i)=="E"){
+			else if ( mac.charAt(i) == "E") {
 				cleanedMac+=mac.charAt(i);
 			}
-			else if(mac.charAt(i)=="F"){
+			else if ( mac.charAt(i) == "F") {
 				cleanedMac+=mac.charAt(i);
 			}
-			else if(mac.charAt(i)==":"){
+			else if ( mac.charAt(i) == ":") {
 				//left blank because we do not want to add the separators to the cleaned mac address
 			}
-			else if(mac.charAt(i)==" "){
+			else if ( mac.charAt(i) == " ") {
 				
 			}
-			else if(mac.charAt(i)=="-"){
+			else if ( mac.charAt(i) == "-") {
 				
 			}
-			else if(mac.charAt(i)==";"){
+			else if ( mac.charAt(i) == ";") {
 				
 			}
-			else if(!isNaN(mac.charAt(i))){
+			else if ( !isNaN(mac.charAt(i))) {
 				cleanedMac+=mac.charAt(i);
 			}
 			
@@ -280,7 +280,7 @@ function removecolons(mac){//this just iterates through the string and adds each
 }
 
 
-function refocus(){
+function refocus() {
 	//refocuses onto the text area after number of copies is selected
 	document.myform.mytextfield.focus();
 }
@@ -292,11 +292,15 @@ function refocus(){
 	<span id="test" style="font-size: 1.25em;">MAC Address and Serial Number Label Printer</span><br />
 		To choose another kind of label to print out, please use the link at the bottom of the page to go back. Using the back button on the browser may print out extra labels.
 		<form name="myform">
-			<select id="SM" name="SorM" >
+			<?
+/*
+			<select id="SM" name="SorM">
 				<option value="1">Mac</option>
 				<option value="2">Serial</option>
 			</select>
 			<br />
+*/
+			?>
 			<textarea name="mytextfield" id="IDMac" rows="2" onkeyup="enterlisten(event)"></textarea><br />
 			<!--<input type="checkbox" name="cbautoprint" id="autoprint" value="yes">Automatically print-->
 			Print to:
@@ -304,15 +308,15 @@ function refocus(){
 			<?
 			$printers=get_printers();
 			$selected="0";
-			if(isset($_REQUEST['printer'])){
+			if ( isset($_REQUEST['printer'])) {
 				$selected=$_REQUEST['printer'];
 			}else{
-				if(isset($_COOKIE['print'])){
+				if ( isset($_COOKIE['print'])) {
 					$selected=$_COOKIE['print'];
 				}
 			}
-			for($i=0;$i<count($printers);$i++){
-				if($i==$selected){
+			for($i=0;$i<count($printers);$i++) {
+				if ( $i == $selected) {
 					printf("<option value = \"%s\" selected>%s</option>",$i,$printers[$i][3]);
 				}else{
 					printf("<option value = \"%s\">%s</option>",$i,$printers[$i][3]);
