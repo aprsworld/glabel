@@ -132,11 +132,11 @@ function printLargeLabel($p0,$p1,$numToPrint){
 	if ( strlen($p0) > 8 ) {
 		$outToPrinter.= sprintf("A795,20,1,5,4,2,N,\"%s\"\n",$p0);
 	} else {
-		$outToPrinter.= sprintf("A795,20,1,5,4,4,N,\"%s\"\n",$p0); //if part# is 8 characters or less, stretch it
+		$outToPrinter.= sprintf("A795,20,1,5,4,4,N,\"%s\"\n",$p0);
 	}
 	
-	$outToPrinter.= sprintf("A467,60,1,5,1,1,N,\"%s\"\n",str_replace('"',"''",substr($p1,0,28))). // first 28 chars of description
-			sprintf("A371,60,1,5,1,1,N,\"%s\"\n",str_replace('"',"''",substr($p1,28,28))).// The rest of the description that will fit
+	$outToPrinter.= sprintf("A467,60,1,5,1,1,N,\"%s\"\n",str_replace('"',"''",substr($p1,0,28))). 
+			sprintf("A371,60,1,5,1,1,N,\"%s\"\n",str_replace('"',"''",substr($p1,28,28))).
 			//"B90,5,0,3,2,4,65,N,\APRS9111\"\n".
 			sprintf("B275,40,1,3,2,8,130,N,\"%s\"\n",$p0).
 			"P".($numToPrint*$nCopies)."\n";
@@ -170,7 +170,7 @@ if ( count($errors) ) {
 <td>
 <h1>Bin Labels</h1>
 To choose another kind of label to print out, please use the link at the bottom of the page to go back. Using the back button on the browser may print out extra labels.<br /><br />
-<form method="get" action="/glabel/bin/">
+<form method="get" action="/glabel/bin/index2.php">
 <textarea name="partNumber" rows="20">
 </textarea>
 <br />

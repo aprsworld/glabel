@@ -334,7 +334,7 @@ if ( $print ) {
 			<option value="14">14</option>
 			<option value="15">15</option>
 		</select>
-		<form method="get" action="/glabel/custom/" id="printform">
+		<form method="get" action="/glabel/custom/index2.php" id="printform">
 			<textarea id="IDta" name="ta" rows="5" cols="34" onkeyup="makeprev()"><?echo $replace;?></textarea>
 			<br />
 		<select id="printerS" name="printer">
@@ -350,9 +350,9 @@ if ( $print ) {
 			}
 			for($i=0;$i<count($printers);$i++ ) {
 				if ( $i==$selected ) {
-					printf("<option value = \"%s\" selected>%s</option>",$i,$printers[$i][3]);
+					printf("<option value = \"%s\" selected>%s</option>\n",$i,$printers[$i][3]);
 				} else {
-					printf("<option value = \"%s\">%s</option>",$i,$printers[$i][3]);
+					printf("<option value = \"%s\">%s</option>\n",$i,$printers[$i][3]);
 				}
 			}
 			?>

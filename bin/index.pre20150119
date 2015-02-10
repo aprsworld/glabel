@@ -52,9 +52,7 @@ if ( isset($_REQUEST['partNumber']) && '' != trim($_REQUEST['partNumber']) ) {
 			$copies=count(array_keys($pNumbers,$pNumbers[$i]));//this finds the amount of times the item is found in the array so we can print out that many copies
 	//		printf("%s was found %s times",$pNumbers[$i],$copies);
 			$part = read_part($pNumbers[$i]);//looks up the number
-			//printf("PART: %s",$part);
-		//	print_r($part);
-			if ( '' == $part[0] ) {
+			if ( false == $part ) {
 				$errors[]=sprintf("Part number %s not found.",$pNumbers[$i]);
 			} else {
 				$printers = get_printers();
@@ -101,7 +99,7 @@ function printLabel($p0,$p1,$numToPrint){
 			"P".($numToPrint*$nCopies)."\n";
 
 
-	//printf($outToPrinter);
+
 	$sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 	$checkSocket = socket_connect($sock,$printers[$printer][0], $printers[$printer][1]);
 //	$checkSocket = socket_connect($sock,"192.168.10.130", 9100);
@@ -132,17 +130,17 @@ function printLargeLabel($p0,$p1,$numToPrint){
 	if ( strlen($p0) > 8 ) {
 		$outToPrinter.= sprintf("A795,20,1,5,4,2,N,\"%s\"\n",$p0);
 	} else {
-		$outToPrinter.= sprintf("A795,20,1,5,4,4,N,\"%s\"\n",$p0); //if part# is 8 characters or less, stretch it
+		$outToPrinter.= sprintf("A795,20,1,5,4,4,N,\"%s\"\n",$p0);
 	}
-	
-	$outToPrinter.= sprintf("A467,60,1,5,1,1,N,\"%s\"\n",str_replace('"',"''",substr($p1,0,28))). // first 28 chars of description
-			sprintf("A371,60,1,5,1,1,N,\"%s\"\n",str_replace('"',"''",substr($p1,28,28))).// The rest of the description that will fit
+
+	$outToPrinter.= sprintf("A467,60,1,5,1,1,N,\"%s\"\n",substr($p1,0,28)). 
+			sprintf("A371,60,1,5,1,1,N,\"%s\"\n",substr($p1,28,28)).
 			//"B90,5,0,3,2,4,65,N,\APRS9111\"\n".
 			sprintf("B275,40,1,3,2,8,130,N,\"%s\"\n",$p0).
 			"P".($numToPrint*$nCopies)."\n";
 
 	
-	//printf($outToPrinter);
+	
 	$sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 	$checkSocket = socket_connect($sock,$printers[$printer][0], $printers[$printer][1]);
 //	$checkSocket = socket_connect($sock,"192.168.10.130", 9100);
@@ -170,7 +168,7 @@ if ( count($errors) ) {
 <td>
 <h1>Bin Labels</h1>
 To choose another kind of label to print out, please use the link at the bottom of the page to go back. Using the back button on the browser may print out extra labels.<br /><br />
-<form method="get" action="/glabel/bin/">
+<form method="get" action="/glabel/bigBin/">
 <textarea name="partNumber" rows="20">
 </textarea>
 <br />
