@@ -16,8 +16,9 @@ function get_printers(){
 	/*Shipping Printer*/
 	array("192.168.10.38",9100,"small","2 x 0.75 Shipping Label Printer"),
 	/*Large*/
-	array("192.168.10.33",9100,"large","4 x 6 Office label Printer")
-	);
+	array("192.168.10.33",9100,"large","4 x 6 Office label Printer"),
+	/*Shipping Large*/
+	array("192.168.10.29",9100,"large","4 x 6 Shipping label Printer"));
 	return $Printers;
 }
 	
